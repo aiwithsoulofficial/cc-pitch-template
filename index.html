@@ -493,9 +493,25 @@ p { font-size:0.9rem; color:var(--text-mid); font-weight:300; line-height:1.8; }
         <p>Project begins from date initial payment is received.</p>
       </div>
     </div>
-    <div class="split-even" style="max-width:500px; margin-top:2rem;">
-      <div><div class="sig-line"></div><p class="sig-label">Signature</p></div>
-      <div><div class="sig-line"></div><p class="sig-label">Date</p></div>
+    <div id="sig-section" style="margin-top:2rem; max-width:600px;">
+      <div style="display:grid; grid-template-columns:2fr 1fr; gap:1.5rem; align-items:end;">
+        <div>
+          <p class="sig-label" style="margin-bottom:0.4rem;">Sign below</p>
+          <div style="position:relative; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:8px; overflow:hidden;">
+            <canvas id="sig-canvas" width="400" height="140" style="width:100%; height:140px; cursor:crosshair; display:block; touch-action:none;"></canvas>
+            <button onclick="clearSig()" style="position:absolute; top:6px; right:6px; background:rgba(255,255,255,0.1); border:none; color:var(--text-faint); font-size:0.6rem; padding:3px 8px; border-radius:3px; cursor:pointer; font-family:'Montserrat',sans-serif;">Clear</button>
+          </div>
+        </div>
+        <div>
+          <p class="sig-label" style="margin-bottom:0.4rem;">Date</p>
+          <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:8px; padding:0.8rem 1rem; font-size:0.85rem; color:var(--text-mid);" id="sig-date"></div>
+        </div>
+      </div>
+      <button id="accept-btn" onclick="acceptProposal()" style="margin-top:1.5rem; background:var(--teal-bright); color:var(--dark); border:none; padding:0.9rem 2.5rem; font-family:'Montserrat',sans-serif; font-size:0.75rem; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; border-radius:6px; cursor:pointer; transition:all 0.2s;">Accept Proposal</button>
+      <div id="accept-confirm" style="display:none; margin-top:1.5rem; padding:1.2rem; background:rgba(0,212,188,0.1); border:1px solid var(--teal); border-radius:8px;">
+        <p style="color:var(--teal-bright); font-family:'Montserrat',sans-serif; font-weight:700; font-size:0.85rem;">Proposal Accepted</p>
+        <p style="font-size:0.8rem; color:var(--text-mid); margin-top:0.3rem;">Thank you! We'll be in touch shortly to get started.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -529,6 +545,65 @@ document.addEventListener('keydown', function(e) {
     else document.exitFullscreen();
   }
 });
+
+// Signature pad
+const canvas = document.getElementById('sig-canvas');
+const ctx = canvas ? canvas.getContext('2d') : null;
+let drawing = false;
+let hasSigned = false;
+
+if (ctx) {
+  ctx.strokeStyle = '#00D4BC';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+
+  function getPos(e) {
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches ? e.touches[0] : e;
+    return { x: (t.clientX - r.left) * (canvas.width / r.width), y: (t.clientY - r.top) * (canvas.height / r.height) };
+  }
+
+  canvas.addEventListener('mousedown', e => { drawing = true; hasSigned = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
+  canvas.addEventListener('mousemove', e => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); });
+  canvas.addEventListener('mouseup', () => drawing = false);
+  canvas.addEventListener('mouseleave', () => drawing = false);
+
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; hasSigned = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }, {passive:false});
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }, {passive:false});
+  canvas.addEventListener('touchend', () => drawing = false);
+}
+
+// Date
+const dateEl = document.getElementById('sig-date');
+if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-AU', {day:'numeric', month:'long', year:'numeric'});
+
+function clearSig() {
+  if (ctx) { ctx.clearRect(0, 0, canvas.width, canvas.height); hasSigned = false; }
+}
+
+function acceptProposal() {
+  if (!hasSigned) { alert('Please sign above before accepting.'); return; }
+  const sigData = canvas.toDataURL('image/png');
+  const payload = {
+    clinic: document.title.split(' - ')[0],
+    date: document.getElementById('sig-date').textContent,
+    signature: sigData,
+    url: window.location.href
+  };
+
+  // Send notification webhook if configured
+  const webhook = '{{ACCEPT_WEBHOOK}}';
+  if (webhook && !webhook.includes('{{')) {
+    fetch(webhook, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    }).catch(() => {});
+  }
+
+  document.getElementById('accept-btn').style.display = 'none';
+  document.getElementById('accept-confirm').style.display = 'block';
+}
 </script>
 </body>
 </html>
