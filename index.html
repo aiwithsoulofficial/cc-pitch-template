@@ -129,29 +129,76 @@ p { font-size:0.9rem; color:var(--text-mid); font-weight:300; line-height:1.8; }
   .slide-counter, .nav-hint { display:none; }
 }
 @media (max-width:768px) {
-  .slide { min-height:100vh; padding:2.5rem 1.5rem; }
+  /* Snap stays on but slides adapt to portrait */
+  .slide { min-height:100vh; padding:2rem 1.2rem; }
+
+  /* Canva image slides - contain with matching background, no black bars */
+  .slide-img { background:#0A2A28; }
   .slide-img img { width:100%; height:100%; object-fit:contain; }
-  .slide-html { padding:2.5rem 1.5rem; }
+
+  /* HTML slides */
+  .slide-html { padding:2rem 1.2rem; }
   .inner { width:100%; }
-  .split, .split-even { grid-template-columns:1fr; gap:1.5rem; }
-  .grid-2 { grid-template-columns:1fr; gap:1rem; }
-  .grid-4 { grid-template-columns:1fr 1fr; gap:0.8rem; }
-  h2 { font-size:1.3rem; }
-  .task-num { font-size:0.55rem; }
-  .quote { padding:0.6rem 1rem; margin-bottom:1rem; }
-  .quote p { font-size:0.9rem; }
-  p { font-size:0.85rem; }
-  .stat-number { font-size:1.6rem; }
-  .browser-frame .placeholder { height:180px; }
-  .price-card { padding:1.5rem; }
-  .price-tag { font-size:2rem; }
-  .card { padding:1rem; }
-  .card p { font-size:0.75rem; }
+
+  /* Stack all grids */
+  .split { grid-template-columns:1fr; gap:1.2rem; }
+  .split-even { grid-template-columns:1fr; gap:1.2rem; }
+  .grid-2 { grid-template-columns:1fr; gap:0.8rem; }
+  .grid-4 { grid-template-columns:1fr 1fr; gap:0.6rem; }
+
+  /* Force ALL inline grid overrides to stack on mobile */
+  [style*="grid-template-columns"] { grid-template-columns:1fr !important; gap:1rem !important; }
+
+  /* Typography */
+  h2 { font-size:1.2rem; margin-bottom:0.7rem; }
+  h3 { font-size:0.85rem; }
+  .label { font-size:0.55rem; }
+  .task-num { font-size:0.5rem; padding:0.2rem 0.5rem; }
+  p { font-size:0.8rem; line-height:1.6; }
+
+  /* Quote */
+  .quote { padding:0.5rem 0.8rem; margin-bottom:0.8rem; }
+  .quote p { font-size:0.85rem; }
+
+  /* Stats */
+  .stat-number { font-size:1.4rem; }
+  .stat-label { font-size:0.6rem; }
+
+  /* Cards */
+  .card { padding:0.8rem; }
+  .card h4 { font-size:0.65rem; }
+  .card p { font-size:0.7rem; line-height:1.5; }
+
+  /* Browser mockups - smaller */
+  .browser-frame { border-radius:6px; }
+  .browser-bar { height:22px; padding:0 8px; }
+  .browser-dot { width:6px; height:6px; }
+  .browser-frame .placeholder { height:140px; }
+  .browser-frame video, .browser-frame img { max-height:250px; object-fit:cover; }
+  .play-hint { font-size:0.65rem; }
+
+  /* Pricing */
+  .price-card { padding:1.2rem; }
+  .price-tag { font-size:1.8rem; }
+  .includes-list li { font-size:0.7rem; padding:0.25rem 0; }
+  .discount-badge { font-size:0.6rem; padding:0.25rem 0.6rem; }
+
+  /* FAQ */
+  .faq-item { padding:0.5rem 0; }
+  .faq-q { font-size:0.68rem; }
+  .faq-a { font-size:0.72rem; }
+
+  /* Terms */
+  .sig-line { min-width:120px; }
+  .slide [style*="grid-template-columns:1fr 1fr 1fr"] { grid-template-columns:1fr !important; }
+
+  /* Hide desktop-only UI */
   .scroll-arrow { display:none; }
   .slide-counter { display:none; }
-  .nav-hint { display:none; }
-  .faq-item { padding:0.6rem 0; }
-  .sig-line { min-width:150px; }
+  .nav-hint { font-size:0.5rem; }
+
+  /* Demo link */
+  .demo-link { font-size:0.65rem; }
 }
 </style>
 </head>
